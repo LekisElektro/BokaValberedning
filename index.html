@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Boka intervju – Valberedningen</title>
+  <title>Boka intervju · Book an interview – Valberedningen</title>
   <style>
     :root {
       --brand: #FFF313;
@@ -25,16 +25,26 @@
     }
     .wrap { max-width: 640px; margin: 0 auto; padding: 0 16px; }
 
+    /* English text: same content, one step quieter than the Swedish */
+    .en { color: var(--muted); }
+    .en-line { display: block; color: var(--muted); font-weight: 500; font-size: .86em; }
+
     header { background: var(--brand); border-bottom: 3px solid var(--ink); }
     header .wrap { padding: 28px 16px 24px; }
     .kicker { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
     h1 { margin: 4px 0 0; font-size: 2.1rem; line-height: 1.1; font-weight: 800; }
+    h1 .en-line { color: var(--ink); opacity: .7; font-size: .55em; font-weight: 700; margin-top: 4px; }
 
     .intro { margin: 24px 0 8px; }
     .intro p { margin: 0 0 10px; }
+    .divider {
+      display: flex; align-items: center; gap: 12px; margin: 22px 0 18px;
+      font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+    }
+    .divider::before, .divider::after { content: ""; flex: 1; border-top: 2px solid var(--ink); }
 
     section { margin: 32px 0; }
-    h2 { display: flex; align-items: center; gap: 10px; font-size: 1.15rem; margin: 0 0 14px; }
+    h2 { display: flex; align-items: flex-start; gap: 10px; font-size: 1.15rem; line-height: 1.3; margin: 0 0 14px; }
     .step {
       flex: none; display: inline-grid; place-items: center;
       width: 28px; height: 28px; border-radius: 50%;
@@ -50,17 +60,20 @@
       text-align: left; padding: 16px; border-radius: 12px;
       border: 2px solid var(--line); background: var(--card);
     }
-    .type strong { display: block; font-size: 1.05rem; }
-    .type span { display: block; color: var(--muted); font-size: .92rem; margin-top: 4px; }
-    .type .dur { font-weight: 700; margin-top: 10px; }
+    .type strong { display: block; font-size: 1.05rem; line-height: 1.25; }
+    .type .desc { display: block; color: var(--muted); font-size: .92rem; margin-top: 8px; }
+    .type .desc + .desc { margin-top: 4px; }
+    .type .dur { display: block; font-weight: 700; margin-top: 10px; }
     .type:hover, .slot:hover { border-color: var(--ink); }
     .type[aria-pressed="true"], .slot[aria-pressed="true"] { background: var(--brand); border-color: var(--ink); }
-    .type[aria-pressed="true"] span, .slot[aria-pressed="true"] small { color: var(--ink); }
+    .type[aria-pressed="true"] .desc, .type[aria-pressed="true"] .en-line,
+    .slot[aria-pressed="true"] small { color: var(--ink); }
 
     .note { color: var(--muted); font-size: .92rem; margin: -4px 0 16px; }
-    .note p { margin: 0 0 6px; }
+    .note p { margin: 0 0 8px; }
     .day { margin-bottom: 20px; }
     .day h3 { font-size: .98rem; margin: 0 0 8px; }
+    .day h3 .en { font-weight: 500; }
     .slots { display: flex; flex-wrap: wrap; gap: 8px; }
     .slot {
       min-width: 128px; text-align: left; padding: 10px 12px; border-radius: 10px;
@@ -70,9 +83,9 @@
     .slot small { display: block; color: var(--muted); font-size: .78rem; line-height: 1.3; margin-top: 2px; }
     .empty {
       padding: 16px; border: 2px dashed var(--line); border-radius: 12px;
-      color: var(--muted); background: var(--card);
+      color: var(--muted); background: var(--card); margin: 0;
     }
-    .refresh { background: none; border: none; padding: 0; text-decoration: underline; font-size: .92rem; }
+    .refresh { background: none; border: none; padding: 0; text-decoration: underline; font-size: .92rem; color: var(--ink); }
 
     .chosen {
       padding: 10px 14px; margin-bottom: 18px; border-radius: 10px;
@@ -80,6 +93,7 @@
     }
     .field { margin-bottom: 16px; }
     label { display: block; font-weight: 600; margin-bottom: 4px; }
+    label .en { font-weight: 500; }
     input {
       width: 100%; padding: 12px; font: inherit; color: var(--ink);
       border: 2px solid var(--line); border-radius: 10px; background: var(--card);
@@ -87,7 +101,8 @@
     input:focus { outline: none; border-color: var(--ink); }
     input[aria-invalid="true"] { border-color: var(--err); }
     .hint { font-size: .86rem; color: var(--muted); margin-top: 4px; }
-    .hint.bad { color: var(--err); }
+    .hint span { display: block; }
+    .hint.bad, .hint.bad .en { color: var(--err); }
     .hint.good { color: var(--ink); font-weight: 600; }
 
     .btn {
@@ -99,19 +114,23 @@
     .btn[disabled] { opacity: .55; cursor: wait; }
 
     .msg { padding: 12px 14px; border-radius: 10px; margin: 0 0 16px; background: var(--err-bg); color: var(--err); }
+    .msg span { display: block; }
+    .msg .en { color: var(--err); opacity: .85; }
 
     .done {
       margin: 32px 0; padding: 24px; border-radius: 14px;
       background: var(--card); border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--ink);
     }
-    .done h2 { font-size: 1.5rem; margin-bottom: 6px; }
+    .done h2 { display: block; font-size: 1.5rem; margin-bottom: 6px; }
     .done .when {
       display: inline-block; margin: 8px 0 14px; padding: 6px 12px; border-radius: 8px;
       background: var(--brand); font-weight: 800; font-size: 1.1rem;
     }
+    .done .when .en-line { color: var(--ink); opacity: .75; }
     .done p { margin: 0 0 10px; }
 
     footer { border-top: 1px solid var(--line); margin-top: 40px; padding: 18px 0 40px; color: var(--muted); font-size: .9rem; }
+    footer p { margin: 0 0 6px; }
     [hidden] { display: none !important; }
   </style>
 </head>
@@ -119,75 +138,86 @@
   <header>
     <div class="wrap">
       <div class="kicker">Valberedningen · Elektroteknologsektionen</div>
-      <h1>Boka intervju</h1>
+      <h1>Boka intervju<span class="en-line" lang="en">Book an interview</span></h1>
     </div>
   </header>
 
   <main class="wrap">
+    <p id="loading" class="note" style="margin-top:24px">Laddar… <span class="en" lang="en">Loading…</span></p>
     <div id="fatal" class="msg" hidden style="margin-top:24px"></div>
-
-    <p id="loading" class="note" style="margin-top:24px">Laddar…</p>
 
     <div id="app" hidden>
       <div class="intro">
         <p>För att kunna bli nominerad till en post i en förening måste du bli intervjuad av valberedningen. Här bokar du intervjun.</p>
         <p>När du har bokat får du tiden bekräftad med ett sms från någon i valberedningen innan intervjun, tillsammans med var den hålls.</p>
         <p>Fler tider kommer ut löpande. Finns det ingen tid som passar för de föreningar du söker kan du vänta tills nya tider kommer ut eller kontakta valberedningen.</p>
+
+        <div class="divider" lang="en">English</div>
+
+        <div lang="en">
+          <p>To be nominated for a position in one of the section's associations (föreningar), you need to be interviewed by the nomination committee (valberedningen). This is where you book that interview.</p>
+          <p>After you have booked, someone from the nomination committee will confirm your time by text message before the interview and tell you where it will be held.</p>
+          <p>New times are added continuously. If no time works for the associations you are applying to, you can wait for new times or contact the nomination committee.</p>
+        </div>
       </div>
 
       <section>
-        <h2><span class="step">1</span>Vilken intervju ska du boka?</h2>
+        <h2><span class="step">1</span><span>Vilken intervju ska du boka?<span class="en-line" lang="en">Which interview are you booking?</span></span></h2>
         <div class="types">
           <button type="button" class="type" data-type="First" aria-pressed="false">
-            <strong>Förstagångssökande</strong>
-            <span>Du har inte suttit i en förening på Elektroteknologsektionen.</span>
+            <strong>Förstagångssökande<span class="en-line" lang="en">First-time applicant</span></strong>
+            <span class="desc">Du har inte suttit i en förening på Elektroteknologsektionen.</span>
+            <span class="desc" lang="en">You have not been active in an association at the section.</span>
             <span class="dur" id="dur-First"></span>
           </button>
           <button type="button" class="type" data-type="Second" aria-pressed="false">
-            <strong>Tidigare föreningsaktiv</strong>
-            <span>Du är eller har varit föreningsaktiv på sektionen.</span>
+            <strong>Tidigare föreningsaktiv<span class="en-line" lang="en">Previously active</span></strong>
+            <span class="desc">Du är eller har varit föreningsaktiv på sektionen.</span>
+            <span class="desc" lang="en">You are or have been active in an association at the section.</span>
             <span class="dur" id="dur-Second"></span>
           </button>
         </div>
       </section>
 
       <section id="step-slot" hidden>
-        <h2><span class="step">2</span>Välj en tid</h2>
+        <h2><span class="step">2</span><span>Välj en tid<span class="en-line" lang="en">Choose a time</span></span></h2>
         <div class="note">
           <p id="close-text"></p>
-          <p>En tid märkt <b>Ej för</b> kan inte användas om du söker någon av de föreningarna, eftersom någon av intervjuarna sitter där.</p>
-          <button type="button" class="refresh" id="refresh">Uppdatera listan</button>
+          <p>En tid märkt <b>Ej för</b> kan inte användas om du söker någon av de föreningarna, eftersom någon av intervjuarna sitter där.
+            <span class="en-line" lang="en">A time marked <b>Not for</b> can't be used if you are applying to any of those associations, since one of the interviewers is a member there.</span></p>
+          <button type="button" class="refresh" id="refresh">Uppdatera listan · <span lang="en">Refresh list</span></button>
         </div>
         <div id="slot-msg" class="msg" hidden></div>
         <div id="slots"></div>
       </section>
 
       <section id="step-form" hidden>
-        <h2><span class="step">3</span>Dina uppgifter</h2>
-        <div class="chosen">Vald tid: <b id="chosen"></b></div>
+        <h2><span class="step">3</span><span>Dina uppgifter<span class="en-line" lang="en">Your details</span></span></h2>
+        <div class="chosen">Vald tid · <span lang="en">Selected time</span>: <b id="chosen"></b></div>
         <form id="form" novalidate>
           <div class="field">
-            <label for="name">För- och efternamn</label>
+            <label for="name">För- och efternamn · <span class="en" lang="en">Full name</span></label>
             <input id="name" name="name" autocomplete="name" maxlength="80" required>
           </div>
           <div class="field">
-            <label for="phone">Telefonnummer</label>
+            <label for="phone">Telefonnummer · <span class="en" lang="en">Phone number</span></label>
             <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel"
                    placeholder="070-123 45 67" aria-describedby="phone-hint" required>
-            <div class="hint" id="phone-hint">Svenskt mobilnummer, t.ex. 070-123 45 67. Har du ett utländskt nummer, skriv det med landskod, t.ex. +44 7911 123456.</div>
+            <div class="hint" id="phone-hint"></div>
           </div>
           <div id="form-msg" class="msg" hidden></div>
-          <button type="submit" class="btn" id="submit">Boka tiden</button>
+          <button type="submit" class="btn" id="submit"></button>
         </form>
       </section>
     </div>
 
     <div id="done" class="done" hidden>
-      <h2>Tiden är bokad!</h2>
+      <h2>Tiden är bokad!<span class="en-line" lang="en">Your time is booked!</span></h2>
       <div class="when" id="done-when"></div>
       <p id="done-type"></p>
       <p>Innan intervjun får du ett sms från valberedningen som bekräftar tiden och berättar var intervjun hålls.</p>
-      <p id="done-contact"></p>
+      <p class="en" lang="en">Before the interview, you will get a text message from the nomination committee confirming the time and telling you where the interview is held.</p>
+      <div id="done-contact"></div>
     </div>
 
     <footer id="contact"></footer>
@@ -196,6 +226,84 @@
   <script>
     // The /exec link of the Apps Script deployment.
     const API_URL = 'https://script.google.com/macros/s/AKfycbx8ZACmYhmHbYc8_u2TcOCU1FgLCDfyCVg06E5Ii_oDfGXArnB7Q57amN6ki-9gRI5r/exec';
+
+    // ---------- Texts (Swedish, English) ----------
+    const T = {
+      fatal: ['Bokningen är inte tillgänglig just nu. Ladda om sidan om en stund, eller kontakta valberedningen.',
+              'Booking is not available right now. Reload the page in a while, or contact the nomination committee.'],
+      loadingSlots: ['Hämtar lediga tider…', 'Loading available times…'],
+      loadFailed: ['Kunde inte hämta tiderna. Ladda om sidan och försök igen.',
+                   'Could not load the times. Reload the page and try again.'],
+      noSlots: ['Det finns inga lediga tider just nu. Fler tider kommer ut löpande, så titta in igen senare.',
+                'There are no available times right now. New times are added continuously, so check back later.'],
+      notFor: ['Ej för', 'Not for'],
+      phoneHint: ['Svenskt mobilnummer, t.ex. 070-123 45 67. Har du ett utländskt nummer, skriv det med landskod, t.ex. +44 7911 123456.',
+                  'Swedish mobile number, e.g. 070-123 45 67. For a foreign number, include the country code, e.g. +44 7911 123456.'],
+      phoneBad: ['Numret ser inte rätt ut. Ett svenskt mobilnummer har 10 siffror och börjar på 07. Utländska nummer skrivs med landskod, t.ex. +44.',
+                 'The number doesn\'t look right. A Swedish mobile number has 10 digits and starts with 07. Foreign numbers need a country code, e.g. +44.'],
+      phoneOk: ['✓ Sparas som', 'Saved as'],
+      needName: ['Fyll i ditt för- och efternamn.', 'Please enter your full name.'],
+      checkPhone: ['Kontrollera telefonnumret.', 'Please check your phone number.'],
+      pickSlot: ['Välj en tid först.', 'Please choose a time first.'],
+      book: ['Boka tiden', 'Book'],
+      booking: ['Bokar…', 'Booking…'],
+      network: ['Något gick fel med anslutningen. Försök igen. Om bokningen redan hann gå igenom får du veta det.',
+                'Something went wrong with the connection. Please try again. If the booking already went through, you will be told.'],
+      interview: ['Intervju', 'Interview'],
+    };
+    const SERVER_ERRORS = {
+      taken: ['Tiden hann bokas av någon annan. Välj en ny tid.', 'Someone else just booked that time. Please choose another.'],
+      gone: ['Tiden finns inte längre. Välj en ny tid.', 'That time is no longer available. Please choose another.'],
+      closed: ['Bokningen för den tiden har stängt. Välj en ny tid.', 'Booking for that time has closed. Please choose another.'],
+      busy: ['Många bokar just nu. Vänta en stund och försök igen.', 'Many people are booking right now. Wait a moment and try again.'],
+      input: ['Kontrollera namn och telefonnummer.', 'Please check your name and phone number.'],
+      error: ['Något gick fel. Försök igen om en stund.', 'Something went wrong. Please try again in a while.'],
+    };
+    const TYPE_NAMES = { First: ['Förstagångssökande', 'First-time applicant'], Second: ['Tidigare föreningsaktiv', 'Previously active'] };
+    const DAYS = [['Söndag', 'Sunday'], ['Måndag', 'Monday'], ['Tisdag', 'Tuesday'], ['Onsdag', 'Wednesday'],
+                  ['Torsdag', 'Thursday'], ['Fredag', 'Friday'], ['Lördag', 'Saturday']];
+    const MONTHS = [['januari', 'January'], ['februari', 'February'], ['mars', 'March'], ['april', 'April'],
+                    ['maj', 'May'], ['juni', 'June'], ['juli', 'July'], ['augusti', 'August'],
+                    ['september', 'September'], ['oktober', 'October'], ['november', 'November'], ['december', 'December']];
+
+    // ---------- Helpers ----------
+    const state = { type: null, slot: null, slots: [] };
+    const $ = (id) => document.getElementById(id);
+
+    function el(tag, props, ...children) {
+      const e = document.createElement(tag);
+      Object.assign(e, props || {});
+      children.forEach((c) => e.append(c));
+      return e;
+    }
+
+    /** Swedish line followed by the English line. */
+    function bi([sv, en], tag = 'span') {
+      return [el(tag, { textContent: sv }), el(tag, { className: 'en', lang: 'en', textContent: en })];
+    }
+
+    function showMsg(box, pair) {
+      if (!pair) { box.hidden = true; box.replaceChildren(); return; }
+      box.replaceChildren(...bi(pair));
+      box.hidden = false;
+    }
+
+    /** ['Tisdag 3 november', 'Tuesday 3 November'] from '2026-11-03'. */
+    function dayLabels(dayKey) {
+      const [y, m, d] = dayKey.split('-').map(Number);
+      const date = new Date(y, m - 1, d);
+      return [0, 1].map((l) => `${DAYS[date.getDay()][l]} ${d} ${MONTHS[m - 1][l]}`);
+    }
+
+    function closeTexts() {
+      const days = DATA.closeDays, hour = DATA.closeHour;
+      if (typeof days !== 'number' || typeof hour !== 'number') return [DATA.closeText || '', ''];
+      const hh = String(hour).padStart(2, '0') + ':00';
+      const sv = days === 0 ? 'samma dag som' : days === 1 ? 'dagen före' : `${days} dagar före`;
+      const en = days === 0 ? 'on the day of' : days === 1 ? 'the day before' : `${days} days before`;
+      return [`Bokningen för en tid stänger kl ${hh} ${sv} intervjun.`,
+              `Booking for a time closes at ${hh} ${en} the interview.`];
+    }
 
     async function apiGet(params) {
       const res = await fetch(API_URL + '?' + new URLSearchParams(params));
@@ -213,20 +321,6 @@
       return res.json();
     }
 
-    let DATA = null;
-    const TYPE_NAMES = { First: 'Förstagångssökande', Second: 'Tidigare föreningsaktiv' };
-    const state = { type: null, slot: null, slots: [] };
-    const $ = (id) => document.getElementById(id);
-
-    function el(tag, props, ...children) {
-      const e = document.createElement(tag);
-      Object.assign(e, props || {});
-      children.forEach((c) => e.append(c));
-      return e;
-    }
-
-    function showMsg(box, text) { box.textContent = text; box.hidden = !text; }
-
     /** Same rules as normalizePhone_ in WebApp.gs. */
     function normalizePhone(raw) {
       let s = String(raw || '').replace(/[\s\-().\/]/g, '');
@@ -238,22 +332,34 @@
       return null;
     }
 
+    function setButton(pair) {
+      $('submit').replaceChildren(pair[0] + ' · ', el('span', { lang: 'en', textContent: pair[1] }));
+    }
+
+    // ---------- Page ----------
+    let DATA = null;
+
     async function init() {
       try {
         DATA = await apiGet({ action: 'config' });
         if (!DATA.ok) throw new Error(DATA.msg);
       } catch (err) {
         $('loading').hidden = true;
-        showMsg($('fatal'), 'Bokningen är inte tillgänglig just nu. Ladda om sidan om en stund, eller kontakta valberedningen.');
+        showMsg($('fatal'), T.fatal);
         return;
       }
       $('loading').hidden = true;
       $('app').hidden = false;
-      $('dur-First').textContent = `ca ${DATA.minutes.First} min`;
-      $('dur-Second').textContent = `ca ${DATA.minutes.Second} min`;
-      $('close-text').textContent = DATA.closeText;
-      $('contact').textContent = DATA.contactText;
-      $('done-contact').textContent = DATA.contactText;
+
+      $('dur-First').textContent = `${DATA.minutes.First} min`;
+      $('dur-Second').textContent = `${DATA.minutes.Second} min`;
+      const [closeSv, closeEn] = closeTexts();
+      $('close-text').replaceChildren(closeSv, el('span', { className: 'en-line', lang: 'en', textContent: closeEn }));
+      const contact = [DATA.contactText, DATA.contactTextEn];
+      $('contact').replaceChildren(...bi(contact, 'p'));
+      $('done-contact').replaceChildren(...bi(contact, 'p'));
+      setHint('');
+      setButton(T.book);
 
       document.querySelectorAll('.type').forEach((b) =>
         b.addEventListener('click', () => selectType(b.dataset.type)));
@@ -270,98 +376,106 @@
         b.setAttribute('aria-pressed', String(b.dataset.type === type)));
       $('step-slot').hidden = false;
       $('step-form').hidden = true;
-      showMsg($('slot-msg'), '');
+      showMsg($('slot-msg'), null);
       loadSlots();
     }
 
     function loadSlots() {
       const type = state.type;
-      $('slots').replaceChildren(el('p', { className: 'note', textContent: 'Hämtar lediga tider…' }));
+      $('slots').replaceChildren(el('p', { className: 'note' }, ...bi(T.loadingSlots).flatMap((s) => [s, ' '])));
       apiGet({ action: 'slots', type })
         .then((res) => {
           if (!res.ok) throw new Error(res.msg);
-          const list = res.slots;
           if (type !== state.type) return;
-          state.slots = list;
-          if (state.slot && !list.some((s) => s.id === state.slot.id)) {
+          state.slots = res.slots;
+          if (state.slot && !res.slots.some((s) => s.id === state.slot.id)) {
             state.slot = null;
             $('step-form').hidden = true;
           }
           renderSlots();
         })
-        .catch(() => showMsg($('slot-msg'), 'Kunde inte hämta tiderna. Ladda om sidan och försök igen.'));
+        .catch(() => showMsg($('slot-msg'), T.loadFailed));
     }
 
     function renderSlots() {
       if (!state.slots.length) {
-        $('slots').replaceChildren(el('p', { className: 'empty',
-          textContent: 'Det finns inga lediga tider just nu. Fler tider kommer ut löpande, så titta in igen senare.' }));
+        const p = el('p', { className: 'empty' });
+        bi(T.noSlots).forEach((s) => { s.style.display = 'block'; p.append(s); });
+        $('slots').replaceChildren(p);
         return;
       }
       const days = [];
       state.slots.forEach((s) => {
         let day = days[days.length - 1];
-        if (!day || day.key !== s.dayKey) days.push(day = { key: s.dayKey, label: s.dayLabel, slots: [] });
+        if (!day || day.key !== s.dayKey) days.push(day = { key: s.dayKey, slots: [] });
         day.slots.push(s);
       });
-      $('slots').replaceChildren(...days.map((d) =>
-        el('div', { className: 'day' },
-          el('h3', { textContent: d.label }),
-          el('div', { className: 'slots' }, ...d.slots.map(slotButton)))));
+      $('slots').replaceChildren(...days.map((d) => {
+        const [sv, en] = dayLabels(d.key);
+        return el('div', { className: 'day' },
+          el('h3', {}, sv, el('span', { className: 'en', lang: 'en', textContent: ' · ' + en })),
+          el('div', { className: 'slots' }, ...d.slots.map(slotButton)));
+      }));
     }
 
     function slotButton(s) {
       const b = el('button', { type: 'button', className: 'slot' }, el('b', { textContent: s.time }));
-      if (s.excluded) b.append(el('small', { textContent: 'Ej för: ' + s.excluded }));
+      if (s.excluded) b.append(el('small', { textContent: `${T.notFor[0]} / ${T.notFor[1]}: ${s.excluded}` }));
       b.setAttribute('aria-pressed', String(!!state.slot && state.slot.id === s.id));
       b.addEventListener('click', () => selectSlot(s));
       return b;
     }
 
+    function slotText(s) {
+      const [sv, en] = dayLabels(s.dayKey);
+      return `${sv} · ${en}, ${s.time}`;
+    }
+
     function selectSlot(s) {
       state.slot = s;
       renderSlots();
-      $('chosen').textContent = `${s.dayLabel}, ${s.time}` + (s.excluded ? ` (ej för ${s.excluded})` : '');
-      showMsg($('slot-msg'), '');
-      showMsg($('form-msg'), '');
+      $('chosen').textContent = slotText(s) + (s.excluded ? ` (${T.notFor[0]} / ${T.notFor[1]}: ${s.excluded})` : '');
+      showMsg($('slot-msg'), null);
+      showMsg($('form-msg'), null);
       const wasHidden = $('step-form').hidden;
       $('step-form').hidden = false;
       if (wasHidden) $('step-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    function setHint(mode, tel) {
+      const hint = $('phone-hint');
+      if (mode === 'good') {
+        hint.className = 'hint good';
+        hint.replaceChildren(el('span', { textContent: `${T.phoneOk[0]} ${tel}` }),
+                             el('span', { className: 'en', lang: 'en', textContent: `${T.phoneOk[1]} ${tel}` }));
+      } else {
+        hint.className = mode === 'bad' ? 'hint bad' : 'hint';
+        hint.replaceChildren(...bi(mode === 'bad' ? T.phoneBad : T.phoneHint));
+      }
+    }
+
     function checkPhone(strict) {
       const input = $('phone');
-      const hint = $('phone-hint');
       const value = input.value.trim();
       const tel = normalizePhone(value);
-      if (tel) {
-        hint.className = 'hint good';
-        hint.textContent = `✓ Sparas som ${tel}`;
-        input.setAttribute('aria-invalid', 'false');
-      } else if (strict && value) {
-        hint.className = 'hint bad';
-        hint.textContent = 'Numret ser inte rätt ut. Ett svenskt mobilnummer har 10 siffror och börjar på 07. Utländska nummer skrivs med landskod, t.ex. +44.';
-        input.setAttribute('aria-invalid', 'true');
-      } else {
-        hint.className = 'hint';
-        hint.textContent = 'Svenskt mobilnummer, t.ex. 070-123 45 67. Har du ett utländskt nummer, skriv det med landskod, t.ex. +44 7911 123456.';
-        input.setAttribute('aria-invalid', 'false');
-      }
+      if (tel) setHint('good', tel);
+      else setHint(strict && value ? 'bad' : '');
+      input.setAttribute('aria-invalid', String(!tel && strict && !!value));
       return tel;
     }
 
     function submit(e) {
       e.preventDefault();
       const name = $('name').value.trim();
-      if (name.length < 2) { showMsg($('form-msg'), 'Fyll i ditt för- och efternamn.'); $('name').focus(); return; }
-      if (!checkPhone(true)) { showMsg($('form-msg'), 'Kontrollera telefonnumret.'); $('phone').focus(); return; }
-      if (!state.slot) { showMsg($('form-msg'), 'Välj en tid först.'); return; }
+      if (name.length < 2) { showMsg($('form-msg'), T.needName); $('name').focus(); return; }
+      if (!checkPhone(true)) { showMsg($('form-msg'), T.checkPhone); $('phone').focus(); return; }
+      if (!state.slot) { showMsg($('form-msg'), T.pickSlot); return; }
 
       const btn = $('submit');
       btn.disabled = true;
-      btn.textContent = 'Bokar…';
-      showMsg($('form-msg'), '');
-      const reset = () => { btn.disabled = false; btn.textContent = 'Boka tiden'; };
+      setButton(T.booking);
+      showMsg($('form-msg'), null);
+      const reset = () => { btn.disabled = false; setButton(T.book); };
 
       apiPost({ action: 'book', slotId: state.slot.id, name, phone: $('phone').value })
         .then((res) => {
@@ -370,25 +484,30 @@
           if (['taken', 'gone', 'closed'].includes(res.code)) {
             state.slot = null;
             $('step-form').hidden = true;
-            showMsg($('slot-msg'), res.msg);
+            showMsg($('slot-msg'), SERVER_ERRORS[res.code]);
             $('step-slot').scrollIntoView({ behavior: 'smooth', block: 'start' });
             loadSlots();
+          } else if (res.code === 'already') {
+            const when = res.existing ? ` (${slotText(res.existing)})` : '';
+            showMsg($('form-msg'), [`Du har redan en bokad tid${when}. Kontakta valberedningen om du behöver byta.`,
+              `You already have a booked time${when}. Contact the nomination committee if you need to change it.`]);
           } else {
-            showMsg($('form-msg'), res.msg);
+            showMsg($('form-msg'), SERVER_ERRORS[res.code] || [res.msg || SERVER_ERRORS.error[0], SERVER_ERRORS.error[1]]);
           }
         })
-        .catch(() => {
-          reset();
-          showMsg($('form-msg'), 'Något gick fel med anslutningen. Försök igen. Om bokningen redan hann gå igenom får du veta det.');
-        });
+        .catch(() => { reset(); showMsg($('form-msg'), T.network); });
     }
 
     function showDone(slot) {
       $('app').hidden = true;
       $('done').hidden = false;
       $('contact').hidden = true;
-      $('done-when').textContent = `${slot.dayLabel}, ${slot.time}`;
-      $('done-type').textContent = `Intervju: ${TYPE_NAMES[state.type]}`;
+      const [sv, en] = dayLabels(slot.dayKey);
+      $('done-when').replaceChildren(`${sv}, ${slot.time}`,
+        el('span', { className: 'en-line', lang: 'en', textContent: `${en}, ${slot.time}` }));
+      const [tSv, tEn] = TYPE_NAMES[state.type];
+      $('done-type').replaceChildren(`${T.interview[0]}: ${tSv}`,
+        el('span', { className: 'en-line', lang: 'en', textContent: `${T.interview[1]}: ${tEn}` }));
       window.scrollTo(0, 0);
     }
 
